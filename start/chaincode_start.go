@@ -21,11 +21,74 @@ import (
 	"fmt"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
+	
+	//===========addded start================
+	"encoding/json"
+	"strconv"
+	"time"
+	//"strings"
+	//===========addded end================
 )
+
+//============start==========added globle var===============
+var accountPrefix = "acct:"
+//============end==========added globle var===============
 
 // SimpleChaincode example simple Chaincode implementation
 type SimpleChaincode struct {
 }
+
+//===========start======added for account creation ================
+
+
+const (
+	millisPerSecond = int64(time.Second / time.Millisecond)
+	nanosPerMillisecond = int64(time.Millisecond / time.Nanosecond)
+)
+
+func msToTime(ms string) (time.Time, error) {
+	msInt, err := strconv.ParseInt(ms, 10, 64)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	return time.Unix(msInt / millisPerSecond,
+		(msInt % millisPerSecond) * nanosPerMillisecond), nil
+}
+
+type Owner struct {
+	Company  string    `json:"company"`
+	Quantity int      `json:"quantity"`
+}
+
+type CP struct {
+	CUSIP     string  `json:"cusip"`
+	Ticker    string  `json:"ticker"`
+	Par       float64 `json:"par"`
+	Qty       int     `json:"qty"`
+	Discount  float64 `json:"discount"`
+	Maturity  int     `json:"maturity"`
+	Owners    []Owner `json:"owner"`
+	Issuer    string  `json:"issuer"`
+	IssueDate string  `json:"issueDate"`
+}
+
+type Account struct {
+	ID          string  `json:"id"`
+	Prefix      string  `json:"prefix"`
+	CashBalance float64 `json:"cashBalance"`
+	AssetsIds   []string `json:"assetIds"`
+}
+
+type Transaction struct {
+	CUSIP       string   `json:"cusip"`
+	FromCompany string   `json:"fromCompany"`
+	ToCompany   string   `json:"toCompany"`
+	Quantity    int      `json:"quantity"`
+	Discount    float64  `json:"discount"`
+}
+//===========end======added for account creation ================
+
 
 // ============================================================================================================================
 // Main
@@ -145,3 +208,46 @@ func (t *SimpleChaincode) read(stub *shim.ChaincodeStub, args []string) ([]byte,
 
     return valAsbytes, nil
 }
+
+
+
+//========start================add userfunc=================
+func (t *SimpleChaincode) createAccounts(stub shim.ChaincodeStub, args []string) ([]byte, error) {
+	fmt.Println("Creating accounts")
+
+	//  				0
+	// "number of accounts to create"
+	var err error
+	numAccounts, err := strconv.Atoi(args[0])
+	if err != nil {
+		fmt.Println("error creating accounts with input")
+		return nil, errors.New("createAccounts accepts a single integer argument")
+	}
+	//create a bunch of accounts
+	var account Account
+	counter := 1
+	for counter <= numAccounts {
+		var prefix string
+		suffix := "000A"
+		if counter < 10 {
+			prefix = strconv.Itoa(counter) + "0" + suffix
+		} else {
+			prefix = strconv.Itoa(counter) + suffix
+		}
+		var assetIds []string
+		account = Account{ID: "company" + strconv.Itoa(counter), Prefix: prefix, CashBalance: 10000000.0, AssetsIds: assetIds}
+		accountBytes, err := json.Marshal(&account)
+		if err != nil {
+			fmt.Println("error creating account" + account.ID)
+			return nil, errors.New("Error creating account " + account.ID)
+		}
+		err = stub.PutState(accountPrefix + account.ID, accountBytes)
+		counter++
+		fmt.Println("created account" + accountPrefix + account.ID)
+	}
+
+	fmt.Println("Accounts created")
+	return nil, nil
+
+}
+//========end================add userfunc=================
