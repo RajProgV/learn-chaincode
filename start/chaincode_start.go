@@ -267,7 +267,7 @@ func (t* SimpleChaincode) Run(stub shim.ChaincodeStubInterface, function string,
 func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Printf("Query called, determining function")
 	
-	if function == "query" {
+	if function != "query" {
 		fmt.Printf("Function is query")
 		return nil, errors.New("Invalid query function name. Expecting \"query\"")
 	}
