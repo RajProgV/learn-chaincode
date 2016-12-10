@@ -29,7 +29,7 @@ import (
 	"encoding/json"
 	//"strconv"
 	"time"
-	//"strings"
+	"strings"
 	//===========addded end================
 )
 
@@ -38,11 +38,26 @@ type SimpleChaincode struct {
 }
 
 //============start==========added globle var===============
+var cpPrefix = "cp:"
 var accountPrefix = "acct:"
 //============end==========added globle var===============
 
 //===========start======added for account creation ================
+func generateCUSIPSuffix(issueDate string, days int) (string, error) {
 
+	t, err := msToTime(issueDate)
+	if err != nil {
+		return "", err
+	}
+
+	maturityDate := t.AddDate(0, 0, days)
+	month := int(maturityDate.Month())
+	day := maturityDate.Day()
+
+	suffix := seventhDigit[month] + eigthDigit[day]
+	return suffix, nil
+
+}
 
 const (
 	millisPerSecond = int64(time.Second / time.Millisecond)
@@ -252,34 +267,51 @@ func (t* SimpleChaincode) Run(stub shim.ChaincodeStubInterface, function string,
 func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Printf("Query called, determining function")
 	
-	if function != "query" {
+	if function == "query" {
 		fmt.Printf("Function is query")
-		return nil, errors.New("Invalid query function name. Expecting \"query\"")
+		//return nil, errors.New("Invalid query function name. Expecting \"query\"")
+	
+		var A string // Entities
+		var err error
+
+		if len(args) != 1 {
+			return nil, errors.New("Incorrect number of arguments. Expecting name of the person to query")
+		}
+
+		A = args[0]
+
+		// Get the state from the ledger
+		Avalbytes, err := stub.GetState(A)
+		if err != nil {
+			jsonResp := "{\"Error\":\"Failed to get state for " + A + "\"}"
+			return nil, errors.New(jsonResp)
+		}
+
+		if Avalbytes == nil {
+			jsonResp := "{\"Error\":\"Nil amount for " + A + "\"}"
+			return nil, errors.New(jsonResp)
+		}
+
+		jsonResp := "{\"Name\":\"" + A + "\",\"Amount\":\"" + string(Avalbytes) + "\"}"
+		fmt.Printf("Query Response:%s\n", jsonResp)
+		return Avalbytes, nil
+	
+	} else if function == "GetCompany" {
+		fmt.Println("Getting the company")
+		company, err := GetCompany(args[0], stub)
+		if err != nil {
+			fmt.Println("Error from getCompany")
+			return nil, err
+		} else {
+			companyBytes, err1 := json.Marshal(&company)
+			if err1 != nil {
+				fmt.Println("Error marshalling the company")
+				return nil, err1
+			}
+			fmt.Println("All success, returning the company")
+			return companyBytes, nil
+		}
 	}
-	var A string // Entities
-	var err error
-
-	if len(args) != 1 {
-		return nil, errors.New("Incorrect number of arguments. Expecting name of the person to query")
-	}
-
-	A = args[0]
-
-	// Get the state from the ledger
-	Avalbytes, err := stub.GetState(A)
-	if err != nil {
-		jsonResp := "{\"Error\":\"Failed to get state for " + A + "\"}"
-		return nil, errors.New(jsonResp)
-	}
-
-	if Avalbytes == nil {
-		jsonResp := "{\"Error\":\"Nil amount for " + A + "\"}"
-		return nil, errors.New(jsonResp)
-	}
-
-	jsonResp := "{\"Name\":\"" + A + "\",\"Amount\":\"" + string(Avalbytes) + "\"}"
-	fmt.Printf("Query Response:%s\n", jsonResp)
-	return Avalbytes, nil
 }
 
 func main() {
@@ -287,6 +319,92 @@ func main() {
 	if err != nil {
 		fmt.Printf("Error starting Simple chaincode: %s", err)
 	}
+}
+
+
+//===========================start============get company info=================================================
+func GetCompany(companyID string, stub shim.ChaincodeStubInterface) (Account, error) {
+	var company Account
+	companyBytes, err := stub.GetState(accountPrefix + companyID)
+	if err != nil {
+		fmt.Println("Account not found " + companyID)
+		return company, errors.New("Account not found " + companyID)
+	}
+
+	err = json.Unmarshal(companyBytes, &company)
+	if err != nil {
+		fmt.Println("Error unmarshalling account " + companyID + "\n err:" + err.Error())
+		return company, errors.New("Error unmarshalling account " + companyID)
+	}
+
+	return company, nil
+}
+//===========================end============get company info=================================================
+
+//===========================start============Account creation=================================================
+func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	fmt.Println("Creating account")
+
+	// Obtain the username to associate with the account
+	if len(args) != 1 {
+		fmt.Println("Error obtaining username")
+		return nil, errors.New("createAccount accepts a single username argument")
+	}
+	username := args[0]
+
+	// Build an account object for the user
+	var assetIds []string
+	suffix := "000A"
+	prefix := username + suffix
+	var account = Account{ID: username, Prefix: prefix, CashBalance: 10000000.0, AssetsIds: assetIds}
+	accountBytes, err := json.Marshal(&account)
+	if err != nil {
+		fmt.Println("error creating account" + account.ID)
+		return nil, errors.New("Error creating account " + account.ID)
+	}
+
+	fmt.Println("Attempting to get state of any existing account for " + account.ID)
+	existingBytes, err := stub.GetState(accountPrefix + account.ID)
+	if err == nil {
+
+		var company Account
+		err = json.Unmarshal(existingBytes, &company)
+		if err != nil {
+			fmt.Println("Error unmarshalling account " + account.ID + "\n--->: " + err.Error())
+
+			if strings.Contains(err.Error(), "unexpected end") {
+				fmt.Println("No data means existing account found for " + account.ID + ", initializing account.")
+				err = stub.PutState(accountPrefix + account.ID, accountBytes)
+
+				if err == nil {
+					fmt.Println("created account" + accountPrefix + account.ID)
+					return nil, nil
+				} else {
+					fmt.Println("failed to create initialize account for " + account.ID)
+					return nil, errors.New("failed to initialize an account for " + account.ID + " => " + err.Error())
+				}
+			} else {
+				return nil, errors.New("Error unmarshalling existing account " + account.ID)
+			}
+		} else {
+			fmt.Println("Account already exists for " + account.ID + " " + company.ID)
+			return nil, errors.New("Can't reinitialize existing user " + account.ID)
+		}
+	} else {
+
+		fmt.Println("No existing account found for " + account.ID + ", initializing account.")
+		err = stub.PutState(accountPrefix + account.ID, accountBytes)
+
+		if err == nil {
+			fmt.Println("created account" + accountPrefix + account.ID)
+			return nil, nil
+		} else {
+			fmt.Println("failed to create initialize account for " + account.ID)
+			return nil, errors.New("failed to initialize an account for " + account.ID + " => " + err.Error())
+		}
+
+	}
+
 }
 
 func (t *SimpleChaincode) createAccounts(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
@@ -327,3 +445,70 @@ func (t *SimpleChaincode) createAccounts(stub shim.ChaincodeStubInterface, args 
 	return nil, nil
 
 }
+//===========================end============Account creation=================================================
+
+
+//===========================start============standard value =================================================
+//lookup tables for last two digits of CUSIP
+var seventhDigit = map[int]string{
+	1:  "A",
+	2:  "B",
+	3:  "C",
+	4:  "D",
+	5:  "E",
+	6:  "F",
+	7:  "G",
+	8:  "H",
+	9:  "J",
+	10: "K",
+	11: "L",
+	12: "M",
+	13: "N",
+	14: "P",
+	15: "Q",
+	16: "R",
+	17: "S",
+	18: "T",
+	19: "U",
+	20: "V",
+	21: "W",
+	22: "X",
+	23: "Y",
+	24: "Z",
+}
+
+var eigthDigit = map[int]string{
+	1:  "1",
+	2:  "2",
+	3:  "3",
+	4:  "4",
+	5:  "5",
+	6:  "6",
+	7:  "7",
+	8:  "8",
+	9:  "9",
+	10: "A",
+	11: "B",
+	12: "C",
+	13: "D",
+	14: "E",
+	15: "F",
+	16: "G",
+	17: "H",
+	18: "J",
+	19: "K",
+	20: "L",
+	21: "M",
+	22: "N",
+	23: "P",
+	24: "Q",
+	25: "R",
+	26: "S",
+	27: "T",
+	28: "U",
+	29: "V",
+	30: "W",
+	31: "X",
+}
+
+//===========================end============standard value=================================================
