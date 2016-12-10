@@ -269,8 +269,8 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 	
 	if function == "query" {
 		fmt.Printf("Function is query")
-		//return nil, errors.New("Invalid query function name. Expecting \"query\"")
-	
+		return nil, errors.New("Invalid query function name. Expecting \"query\"")
+	}
 		var A string // Entities
 		var err error
 
@@ -296,7 +296,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		fmt.Printf("Query Response:%s\n", jsonResp)
 		return Avalbytes, nil
 	
-	} else if function == "GetCompany" {
+	/*} else if function == "GetCompany" {
 		fmt.Println("Getting the company")
 		company, err := GetCompany(args[0], stub)
 		if err != nil {
@@ -311,7 +311,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 			fmt.Println("All success, returning the company")
 			return companyBytes, nil
 		}
-	}
+	}*/
 }
 
 func main() {
