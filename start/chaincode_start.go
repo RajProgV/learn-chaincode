@@ -24,12 +24,12 @@ import (
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	//"https://github.com/test56tester28tt/fabric/core/chaincode/shim"
-	
+
 	//===========addded start================
 	"encoding/json"
 	//"strconv"
-	"time"
 	"strings"
+	"time"
 	//===========addded end================
 )
 
@@ -40,6 +40,7 @@ type SimpleChaincode struct {
 //============start==========added globle var===============
 var cpPrefix = "cp:"
 var accountPrefix = "acct:"
+
 //============end==========added globle var===============
 
 //===========start======added for account creation ================
@@ -60,7 +61,7 @@ func generateCUSIPSuffix(issueDate string, days int) (string, error) {
 }
 
 const (
-	millisPerSecond = int64(time.Second / time.Millisecond)
+	millisPerSecond     = int64(time.Second / time.Millisecond)
 	nanosPerMillisecond = int64(time.Millisecond / time.Nanosecond)
 )
 
@@ -70,13 +71,13 @@ func msToTime(ms string) (time.Time, error) {
 		return time.Time{}, err
 	}
 
-	return time.Unix(msInt / millisPerSecond,
-		(msInt % millisPerSecond) * nanosPerMillisecond), nil
+	return time.Unix(msInt/millisPerSecond,
+		(msInt%millisPerSecond)*nanosPerMillisecond), nil
 }
 
 type Owner struct {
-	Company  string    `json:"company"`
-	Quantity int      `json:"quantity"`
+	Company  string `json:"company"`
+	Quantity int    `json:"quantity"`
 }
 
 type CP struct {
@@ -92,25 +93,25 @@ type CP struct {
 }
 
 type Account struct {
-	ID          string  `json:"id"`
-	Prefix      string  `json:"prefix"`
-	CashBalance float64 `json:"cashBalance"`
+	ID          string   `json:"id"`
+	Prefix      string   `json:"prefix"`
+	CashBalance float64  `json:"cashBalance"`
 	AssetsIds   []string `json:"assetIds"`
 }
 
 type Transaction struct {
-	CUSIP       string   `json:"cusip"`
-	FromCompany string   `json:"fromCompany"`
-	ToCompany   string   `json:"toCompany"`
-	Quantity    int      `json:"quantity"`
-	Discount    float64  `json:"discount"`
+	CUSIP       string  `json:"cusip"`
+	FromCompany string  `json:"fromCompany"`
+	ToCompany   string  `json:"toCompany"`
+	Quantity    int     `json:"quantity"`
+	Discount    float64 `json:"discount"`
 }
-//===========end======added for account creation ================
 
+//===========end======added for account creation ================
 
 func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Printf("Init called, initializing chaincode")
-	
+
 	var A, B string    // Entities
 	var Aval, Bval int // Asset holdings
 	var err error
@@ -149,7 +150,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 // Transaction makes payment of X units from A to B
 func (t *SimpleChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Printf("Running invoke")
-	
+
 	var A, B string    // Entities
 	var Aval, Bval int // Asset holdings
 	var X int          // Transaction value
@@ -205,7 +206,7 @@ func (t *SimpleChaincode) invoke(stub shim.ChaincodeStubInterface, args []string
 // Deletes an entity from state
 func (t *SimpleChaincode) delete(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Printf("Running delete")
-	
+
 	if len(args) != 1 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 3")
 	}
@@ -225,7 +226,7 @@ func (t *SimpleChaincode) delete(stub shim.ChaincodeStubInterface, args []string
 // This chaincode will manage two accounts A and B and will transfer X units from A to B upon invoke
 func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Printf("Invoke called, determining function")
-	
+
 	// Handle different functions
 	if function == "invoke" {
 		// Transaction makes payment of X units from A to B
@@ -243,9 +244,9 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 	return nil, errors.New("Received unknown function invocation")
 }
 
-func (t* SimpleChaincode) Run(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
+func (t *SimpleChaincode) Run(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Printf("Run called, passing through to Invoke (same function)")
-	
+
 	// Handle different functions
 	if function == "invoke" {
 		// Transaction makes payment of X units from A to B
@@ -266,11 +267,44 @@ func (t* SimpleChaincode) Run(stub shim.ChaincodeStubInterface, function string,
 // Query callback representing the query of a chaincode
 func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Printf("Query called, determining function")
-	
-	if function != "query" {
+
+	/*
+		********************************************old function body*******************************************
+		if function != "query" {
+			fmt.Printf("Function is query")
+			return nil, errors.New("Invalid query function name. Expecting \"query\"")
+		}
+			var A string // Entities
+			var err error
+
+			if len(args) != 1 {
+				return nil, errors.New("Incorrect number of arguments. Expecting name of the person to query")
+			}
+
+			A = args[0]
+
+			// Get the state from the ledger
+			Avalbytes, err := stub.GetState(A)
+			if err != nil {
+				jsonResp := "{\"Error\":\"Failed to get state for " + A + "\"}"
+				return nil, errors.New(jsonResp)
+			}
+
+			if Avalbytes == nil {
+				jsonResp := "{\"Error\":\"Nil amount for " + A + "\"}"
+				return nil, errors.New(jsonResp)
+			}
+
+			jsonResp := "{\"Name\":\"" + A + "\",\"Amount\":\"" + string(Avalbytes) + "\"}"
+			fmt.Printf("Query Response:%s\n", jsonResp)
+			return Avalbytes, nil
+			********************************************old function body*******************************************
+	*/
+
+	if function == "query" {
 		fmt.Printf("Function is query")
-		return nil, errors.New("Invalid query function name. Expecting \"query\"")
-	}
+		//return nil, errors.New("Invalid query function name. Expecting \"query\"")
+		//}
 		var A string // Entities
 		var err error
 
@@ -295,7 +329,25 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		jsonResp := "{\"Name\":\"" + A + "\",\"Amount\":\"" + string(Avalbytes) + "\"}"
 		fmt.Printf("Query Response:%s\n", jsonResp)
 		return Avalbytes, nil
-	
+	} else if function == "GetCompany" {
+		fmt.Println("Getting the company")
+		company, err := GetCompany(args[0], stub)
+		if err != nil {
+			fmt.Println("Error from getCompany")
+			return nil, err
+		} else {
+			companyBytes, err1 := json.Marshal(&company)
+			if err1 != nil {
+				fmt.Println("Error marshalling the company")
+				return nil, err1
+			}
+			fmt.Println("All success, returning the company")
+			return companyBytes, nil
+		}
+	}
+
+	return nil, errors.New("Invalid query function name. Expecting \"query\"")
+
 }
 
 func main() {
@@ -304,7 +356,6 @@ func main() {
 		fmt.Printf("Error starting Simple chaincode: %s", err)
 	}
 }
-
 
 //===========================start============get company info=================================================
 func GetCompany(companyID string, stub shim.ChaincodeStubInterface) (Account, error) {
@@ -323,6 +374,7 @@ func GetCompany(companyID string, stub shim.ChaincodeStubInterface) (Account, er
 
 	return company, nil
 }
+
 //===========================end============get company info=================================================
 
 //===========================start============Account creation=================================================
@@ -358,7 +410,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 
 			if strings.Contains(err.Error(), "unexpected end") {
 				fmt.Println("No data means existing account found for " + account.ID + ", initializing account.")
-				err = stub.PutState(accountPrefix + account.ID, accountBytes)
+				err = stub.PutState(accountPrefix+account.ID, accountBytes)
 
 				if err == nil {
 					fmt.Println("created account" + accountPrefix + account.ID)
@@ -377,7 +429,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	} else {
 
 		fmt.Println("No existing account found for " + account.ID + ", initializing account.")
-		err = stub.PutState(accountPrefix + account.ID, accountBytes)
+		err = stub.PutState(accountPrefix+account.ID, accountBytes)
 
 		if err == nil {
 			fmt.Println("created account" + accountPrefix + account.ID)
@@ -420,7 +472,7 @@ func (t *SimpleChaincode) createAccounts(stub shim.ChaincodeStubInterface, args 
 			fmt.Println("error creating account" + account.ID)
 			return nil, errors.New("Error creating account " + account.ID)
 		}
-		err = stub.PutState(accountPrefix + account.ID, accountBytes)
+		err = stub.PutState(accountPrefix+account.ID, accountBytes)
 		counter++
 		fmt.Println("created account" + accountPrefix + account.ID)
 	}
@@ -429,8 +481,8 @@ func (t *SimpleChaincode) createAccounts(stub shim.ChaincodeStubInterface, args 
 	return nil, nil
 
 }
-//===========================end============Account creation=================================================
 
+//===========================end============Account creation=================================================
 
 //===========================start============standard value =================================================
 //lookup tables for last two digits of CUSIP
