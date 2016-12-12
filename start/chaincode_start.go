@@ -332,8 +332,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 	} else if function == "GetCompany" {
 		var company Account
 		fmt.Println("Getting the company")
-		company, err := GetCompany(args[0], stub)
-		companyBytes, err := stub.GetState(accountPrefix + company)
+		companyBytes, err := stub.GetState(accountPrefix + args[0])
 		return companyBytes, nil
 
 		/*company, err := GetCompany(args[0], stub)
