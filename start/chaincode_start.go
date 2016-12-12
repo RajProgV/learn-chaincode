@@ -336,23 +336,23 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 			return nil, errors.New("Account not found " + args[0])
 		}
 
-		err1 = json.Unmarshal(companyBytes, &company)
-		if err1 != nil {
-			fmt.Println("Error unmarshalling account " + args[0] + "\n err:" + err.Error())
-			return nil, errors.New("Error unmarshalling account " + args[0])
-		}
+		//err1 = json.Unmarshal(companyBytes, &company)
+		//if err1 != nil {
+		//	fmt.Println("Error unmarshalling account " + args[0] + "==== err:" + err.Error())
+		//	return nil, errors.New("Error unmarshalling account " + args[0])
+		//}
 
 		//company, err := GetCompany(args[0], stub)
 		//if err != nil {
 		//	fmt.Println("============Error from getCompany")
 		//	return nil, err
 		//} else
-		 {
-			companyBytes, err1 := json.Marshal(&company)
-			if err1 != nil {
-				fmt.Println("Error marshalling the company")
-				return nil, err1
-			}
+		 //{
+		//	companyBytes, err1 := json.Marshal(&company)
+		//	if err1 != nil {
+		//		fmt.Println("Error marshalling the company")
+		//		return nil, err1
+		//	}
 			fmt.Println("All success, returning the company")
 			return companyBytes, nil
 		}
