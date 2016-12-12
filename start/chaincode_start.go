@@ -148,6 +148,8 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 func (t *SimpleChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Printf("=========================Running invoke")
 
+
+
 	var A, B string    // Entities
 	var Aval, Bval int // Asset holdings
 	var X int          // Transaction value
@@ -236,6 +238,10 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		// Deletes an entity from its state
 		fmt.Printf("=========================Function is delete")
 		return t.delete(stub, args)
+	} else if function == "createAccount" {
+		// Deletes an entity from its state
+		fmt.Printf("=========================Function is delete")
+		return t.createAccount(stub, args)
 	}
 
 	return nil, errors.New("Received unknown function invocation")
