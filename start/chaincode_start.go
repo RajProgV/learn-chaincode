@@ -341,7 +341,8 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 			return nil, errors.New("Account not found " + args[0])
 		}
 n = bytes.Index(companyBytes, []byte{0})
-s = string(companyBytes[:n])
+fmt.Println("==================values == ====/d", n)
+//s = string(companyBytes[:n])
 fmt.Println("==================values == ===="+ s)
 		
 		/*err1 = json.Unmarshal(companyBytes, &company)
