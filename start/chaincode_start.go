@@ -300,7 +300,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 			return Avalbytes, nil
 			********************************************old function body*******************************************
 	*/
-	fmt.Printf("=========================In Query Method=====================")
+	fmt.Printf("=========================In Query Method=====================val = "+function+"====")
 	if function == "query" {
 		fmt.Printf("==================Function is query =====================")
 		//return nil, errors.New("Invalid query function name. Expecting \"query\"")
