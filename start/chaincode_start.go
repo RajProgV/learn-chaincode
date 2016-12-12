@@ -333,8 +333,12 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		var company Account
 		fmt.Println("Getting the company")
 		companyBytes, err := stub.GetState(accountPrefix + args[0])
-		return companyBytes, nil
-
+		if err != nil {
+			return companyBytes, nil
+		}
+		
+		jsonResp := "{\"Error\":\"Nil amount for " + args[0] + "\"}"
+		return nil, errors.New(jsonResp)
 		/*company, err := GetCompany(args[0], stub)
 		if err != nil {
 			fmt.Println("Error from getCompany")
