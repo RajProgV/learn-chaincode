@@ -330,7 +330,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		fmt.Println("Getting the company")
 
 
-		var company Account
+		//var company Account
 
 		var n int 
 		var s string
