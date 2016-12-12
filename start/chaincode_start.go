@@ -332,13 +332,8 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 	} else if function == "GetCompany" {
 		//var company Account
 		fmt.Println("\n Getting the company=================================")
-		companyBytes, err := stub.GetState(accountPrefix + args[0])
-		if err != nil {
-			return nil, errors.New("Error")
-		}
-		return companyBytes, nil
 		
-		/*company, err := GetCompany(args[0], stub)
+		company, err := GetCompany(args[0], stub)
 		if err != nil {
 			fmt.Println("====================Error from getCompany")
 			return nil, err
@@ -350,7 +345,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 			}
 			fmt.Println("===============All success, returning the company")
 			return companyBytes, nil
-		}*/
+		}
 	}
 	fmt.Printf("=========================Error in Query=====================")
 	return nil, errors.New("Invalid query function name. Expecting \"query\"")
