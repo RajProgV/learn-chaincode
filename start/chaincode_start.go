@@ -331,7 +331,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		return Avalbytes, nil
 	} else if function == "GetCompany" {
 		//var company Account
-		fmt.Println("Getting the company=================================\n========================\n=============================")
+		fmt.Println("\n Getting the company=================================")
 		companyBytes, err := stub.GetState(accountPrefix + args[0])
 		if err != nil {
 			return companyBytes, nil
@@ -368,6 +368,7 @@ func main() {
 //===========================start============get company info=================================================
 func GetCompany(companyID string, stub shim.ChaincodeStubInterface) (Account, error) {
 	var company Account
+	fmt.Println("\n ==============inside funtion GetCompany ==============")
 	companyBytes, err := stub.GetState(accountPrefix + companyID)
 	if err != nil {
 		fmt.Println("Account not found " + companyID)
