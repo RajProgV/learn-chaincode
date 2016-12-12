@@ -355,7 +355,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		//	}
 			fmt.Println("All success, returning the company")
 			return companyBytes, nil
-		}
+		//}
 	} 
 	fmt.Printf("=========================Error in Query=====================")
 	return nil, errors.New("Invalid query function name. Expecting \"query\"")
