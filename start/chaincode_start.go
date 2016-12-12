@@ -340,6 +340,8 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		if err1 != nil {
 			fmt.Println("Error unmarshalling account " + args[0] + "==== err:" + err1.Error())
 			//return nil, errors.New("Error unmarshalling account " + args[0])
+		} else if err1 == nil {
+			fmt.Println("values == %f", company.CashBalance)
 		}
 
 		//company, err := GetCompany(args[0], stub)
