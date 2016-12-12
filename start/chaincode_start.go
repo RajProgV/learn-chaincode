@@ -18,19 +18,15 @@ under the License.
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
+	"strings"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	//"https://github.com/test56tester28tt/fabric/core/chaincode/shim"
-
-	//===========addded start================
-	"encoding/json"
-	//"strconv"
-	"strings"
-	"time"
-	//===========addded end================
 )
 
 // SimpleChaincode example simple Chaincode implementation
