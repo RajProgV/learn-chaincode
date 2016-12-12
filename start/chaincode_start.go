@@ -334,11 +334,10 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		fmt.Println("\n Getting the company=================================")
 		companyBytes, err := stub.GetState(accountPrefix + args[0])
 		if err != nil {
-			return companyBytes, nil
+			return nil, errors.New("Error")
 		}
+		return companyBytes, nil
 		
-		jsonResp := "{\"Error\":\"Nil amount for " + args[0] + "\"}"
-		return nil, errors.New(jsonResp)
 		/*company, err := GetCompany(args[0], stub)
 		if err != nil {
 			fmt.Println("====================Error from getCompany")
@@ -368,16 +367,16 @@ func main() {
 //===========================start============get company info=================================================
 func GetCompany(companyID string, stub shim.ChaincodeStubInterface) (Account, error) {
 	var company Account
-	fmt.Println("\n ==============inside funtion GetCompany ==============")
+	fmt.Println("==============inside funtion GetCompany ==============")
 	companyBytes, err := stub.GetState(accountPrefix + companyID)
 	if err != nil {
-		fmt.Println("Account not found " + companyID)
+		fmt.Println("============in funct========Account not found " + companyID)
 		return company, errors.New("Account not found " + companyID)
 	}
 
 	err = json.Unmarshal(companyBytes, &company)
 	if err != nil {
-		fmt.Println("Error unmarshalling account " + companyID + "\n err:" + err.Error())
+		fmt.Println("======in functn====Error unmarshalling account " + companyID + "\n err:" + err.Error())
 		return company, errors.New("Error unmarshalling account " + companyID)
 	}
 
