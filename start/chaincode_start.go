@@ -24,7 +24,6 @@ import (
 	"strconv"
 	"time"
 	"strings"
-	"bytes"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	//"https://github.com/test56tester28tt/fabric/core/chaincode/shim"
@@ -72,36 +71,10 @@ func msToTime(ms string) (time.Time, error) {
 		(msInt%millisPerSecond)*nanosPerMillisecond), nil
 }
 
-type Owner struct {
-	Company  string `json:"company"`
-	Quantity int    `json:"quantity"`
-}
-
-type CP struct {
-	CUSIP     string  `json:"cusip"`
-	Ticker    string  `json:"ticker"`
-	Par       float64 `json:"par"`
-	Qty       int     `json:"qty"`
-	Discount  float64 `json:"discount"`
-	Maturity  int     `json:"maturity"`
-	Owners    []Owner `json:"owner"`
-	Issuer    string  `json:"issuer"`
-	IssueDate string  `json:"issueDate"`
-}
-
 type Account struct {
 	ID          string   `json:"id"`
 	Prefix      string   `json:"prefix"`
 	CashBalance float64  `json:"cashBalance"`
-	AssetsIds   []string `json:"assetIds"`
-}
-
-type Transaction struct {
-	CUSIP       string  `json:"cusip"`
-	FromCompany string  `json:"fromCompany"`
-	ToCompany   string  `json:"toCompany"`
-	Quantity    int     `json:"quantity"`
-	Discount    float64 `json:"discount"`
 }
 
 //===========end======added for account creation ================
@@ -242,6 +215,8 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		// Deletes an entity from its state
 		fmt.Printf("=========================Function is delete")
 		return t.createAccount(stub, args)
+	}else if function == "transaction" {
+		//return t.transferPaper(stub, args)
 	}
 
 	return nil, errors.New("Received unknown function invocation")
@@ -334,45 +309,19 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		return Avalbytes, nil
 	}  else if function == "GetCompany" {
 		fmt.Println("Getting the company")
-
-
-		//var company Account
-
-		var n int 
-		var s string
-
-		companyBytes, err1 := stub.GetState(accountPrefix + args[0])
-		if err1 != nil {
-			fmt.Println("Account not found " + args[0])
-			return nil, errors.New("Account not found " + args[0])
-		}
-n = bytes.Index(companyBytes, []byte{0})
-fmt.Println("==================values == ====%d", n)
-//s = string(companyBytes[:n])
-fmt.Println("==================values == ===="+ s)
-		
-		/*err1 = json.Unmarshal(companyBytes, &company)
-		if err1 != nil {
-			fmt.Println("============Error unmarshalling account " + args[0] + "==== err:" + err1.Error())
-			//return nil, errors.New("Error unmarshalling account " + args[0])
-		} else if err1 == nil {
-			fmt.Println("values == %f", company.CashBalance)
-		}*/
-
-		//company, err := GetCompany(args[0], stub)
-		//if err != nil {
-		//	fmt.Println("============Error from getCompany")
-		//	return nil, err
-		//} else
-		 //{
-		//	companyBytes, err1 := json.Marshal(&company)
-		//	if err1 != nil {
-		//		fmt.Println("Error marshalling the company")
-		//		return nil, err1
-		//	}
+		company, err := GetCompany(args[0], stub)
+		if err != nil {
+			fmt.Println("Error from getCompany")
+			return nil, err
+		} else {
+			companyBytes, err1 := json.Marshal(&company)
+			if err1 != nil {
+				fmt.Println("Error marshalling the company")
+				return nil, err1
+			}
 			fmt.Println("All success, returning the company")
 			return companyBytes, nil
-		//}
+		}
 	} 
 	fmt.Printf("=========================Error in Query=====================")
 	return nil, errors.New("Invalid query function name. Expecting \"query\"")
@@ -577,3 +526,90 @@ var eigthDigit = map[int]string{
 }
 
 //===========================end============standard value=================================================
+
+
+
+//===========================start============transaction function=================================================
+func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	fmt.Println("====================Transferring amount to user.")
+	
+	if len(args) != 3 {
+		return nil, errors.New("Incorrect number of arguments. Expecting commercial paper record")
+	}
+
+
+	var fromCompany Account
+	fmt.Println("Getting State on fromCompany " + args[0])
+	fromCompanyBytes, err := stub.GetState(accountPrefix + args[0])
+	if err != nil {
+		fmt.Println("Account not found " + args[0])
+		return nil, errors.New("Account not found " + args[0])
+	}
+
+	fmt.Println("Unmarshalling FromCompany ")
+	err = json.Unmarshal(fromCompanyBytes, &fromCompany)
+	if err != nil {
+		fmt.Println("Error unmarshalling account " + tr.FromCompany)
+		return nil, errors.New("Error unmarshalling account " + tr.FromCompany)
+	}
+
+	var toCompany Account
+	fmt.Println("Getting State on ToCompany " + args[1])
+	toCompanyBytes, err := stub.GetState(accountPrefix + args[1])
+	if err != nil {
+		fmt.Println("Account not found " + args[1])
+		return nil, errors.New("Account not found " + args[1])
+	}
+
+	fmt.Println("Unmarshalling tocompany")
+	err = json.Unmarshal(toCompanyBytes, &toCompany)
+	if err != nil {
+		fmt.Println("Error unmarshalling account " + args[1])
+		return nil, errors.New("Error unmarshalling account " + args[1])
+	}
+
+	amountToBeTransferred := float64(args[2])
+
+	// If toCompany doesn't have enough cash to buy the papers
+	if toCompany.CashBalance < amountToBeTransferred {
+		fmt.Println("===============The company " + tr.ToCompany + "doesn't have enough cash to complete the transaction")
+		return nil, errors.New("The company " + tr.ToCompany + "doesn't have enough cash to complete the transaction")
+	} else {
+		fmt.Println("===================The ToCompany has enough money to be transferred for this paper")
+	}
+
+	toCompany.CashBalance -= amountToBeTransferred
+	fromCompany.CashBalance += amountToBeTransferred
+
+
+	// Write everything back
+	// To Company
+	toCompanyBytesToWrite, err := json.Marshal(&toCompany)
+	if err != nil {
+		fmt.Println("=============Error marshalling the toCompany")
+		return nil, errors.New("Error marshalling the toCompany")
+	}
+	fmt.Println("==============Put state on toCompany")
+	err = stub.PutState(accountPrefix + tr.ToCompany, toCompanyBytesToWrite)
+	if err != nil {
+		fmt.Println("===============Error writing the toCompany back")
+		return nil, errors.New("Error writing the toCompany back")
+	}
+
+	// From company
+	fromCompanyBytesToWrite, err := json.Marshal(&fromCompany)
+	if err != nil {
+		fmt.Println("===============Error marshalling the fromCompany")
+		return nil, errors.New("Error marshalling the fromCompany")
+	}
+	fmt.Println("==============Put state on fromCompany")
+	err = stub.PutState(accountPrefix + tr.FromCompany, fromCompanyBytesToWrite)
+	if err != nil {
+		fmt.Println("================Error writing the fromCompany back")
+		return nil, errors.New("Error writing the fromCompany back")
+	}
+
+	fmt.Println("Successfully completed Invoke")
+	return nil, nil
+}
+//===========================start============transaction function=================================================
