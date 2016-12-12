@@ -330,7 +330,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		fmt.Printf("Query Response:%s\n", jsonResp)
 		return Avalbytes, nil
 	} else if function == "GetCompany" {
-		var company Account
+		//var company Account
 		fmt.Println("Getting the company")
 		companyBytes, err := stub.GetState(accountPrefix + args[0])
 		if err != nil {
