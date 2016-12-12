@@ -572,8 +572,8 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 
 	// If toCompany doesn't have enough cash to buy the papers
 	if toCompany.CashBalance < amountToBeTransferred {
-		fmt.Println("===============The company " + tr.ToCompany + "doesn't have enough cash to complete the transaction")
-		return nil, errors.New("The company " + tr.ToCompany + "doesn't have enough cash to complete the transaction")
+		fmt.Println("===============The company " + args[1] + "doesn't have enough cash to complete the transaction")
+		return nil, errors.New("The company " + args[0] + "doesn't have enough cash to complete the transaction")
 	} else {
 		fmt.Println("===================The ToCompany has enough money to be transferred for this paper")
 	}
