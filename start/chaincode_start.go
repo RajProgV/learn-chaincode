@@ -24,6 +24,7 @@ import (
 	"strconv"
 	"time"
 	"strings"
+	"bytes"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	//"https://github.com/test56tester28tt/fabric/core/chaincode/shim"
@@ -330,14 +331,18 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 
 
 		var company Account
-		var companyBytes []byte
+
+		var n int 
+		var s string
+
 		companyBytes, err1 := stub.GetState(accountPrefix + args[0])
 		if err1 != nil {
 			fmt.Println("Account not found " + args[0])
 			return nil, errors.New("Account not found " + args[0])
 		}
-
-		fmt.Println("===============================C: ", len(companyBytes), companyBytes[:4])
+n = bytes.Index(companyBytes, []byte{0})
+s = string(companyBytes[:n])
+fmt.Println("==================values == ===="+ s)
 		
 		err1 = json.Unmarshal(companyBytes, &company)
 		if err1 != nil {
