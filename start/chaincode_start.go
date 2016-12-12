@@ -344,13 +344,13 @@ n = bytes.Index(companyBytes, []byte{0})
 s = string(companyBytes[:n])
 fmt.Println("==================values == ===="+ s)
 		
-		err1 = json.Unmarshal(companyBytes, &company)
+		/*err1 = json.Unmarshal(companyBytes, &company)
 		if err1 != nil {
 			fmt.Println("============Error unmarshalling account " + args[0] + "==== err:" + err1.Error())
 			//return nil, errors.New("Error unmarshalling account " + args[0])
 		} else if err1 == nil {
 			fmt.Println("values == %f", company.CashBalance)
-		}
+		}*/
 
 		//company, err := GetCompany(args[0], stub)
 		//if err != nil {
