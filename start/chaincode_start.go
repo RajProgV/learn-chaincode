@@ -367,7 +367,6 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	username := args[0]
 
 	// Build an account object for the user
-	var assetIds []string
 	suffix := "000A"
 	prefix := username + suffix
 	var account = Account{ID: username, Prefix: prefix, CashBalance: 10000000.0}
