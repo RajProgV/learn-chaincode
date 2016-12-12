@@ -342,7 +342,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 				return nil, err1
 			}
 			jsonResp := "{\"Name\":\"" + company + "\",\"Amount\":\"" + string(companyBytes) + "\"}"
-			fmt.Println("All success, returning the company :%s \n" jsonResp)
+			fmt.Println("All success, returning the company :%s \n", jsonResp)
 			return companyBytes, nil
 		}
 	}
