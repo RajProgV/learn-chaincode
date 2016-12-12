@@ -442,7 +442,6 @@ func (t *SimpleChaincode) createAccounts(stub shim.ChaincodeStubInterface, args 
 		} else {
 			prefix = strconv.Itoa(counter) + suffix
 		}
-		var assetIds []string
 		account = Account{ID: "company" + strconv.Itoa(counter), Prefix: prefix, CashBalance: 10000000.0}
 		accountBytes, err := json.Marshal(&account)
 		if err != nil {
