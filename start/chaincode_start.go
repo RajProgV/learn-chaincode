@@ -331,27 +331,27 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		return Avalbytes, nil
 	} else if function == "GetCompany" {
 		//var company Account
-		fmt.Println("Getting the company=================================\n========================\n=============================")
+		/*fmt.Println("Getting the company=================================\n========================\n=============================")
 		companyBytes, err := stub.GetState(accountPrefix + args[0])
 		if err != nil {
 			return companyBytes, nil
 		}
 		
 		jsonResp := "{\"Error\":\"Nil amount for " + args[0] + "\"}"
-		return nil, errors.New(jsonResp)
-		/*company, err := GetCompany(args[0], stub)
+		return nil, errors.New(jsonResp)*/
+		company, err := GetCompany(args[0], stub)
 		if err != nil {
-			fmt.Println("Error from getCompany")
+			fmt.Println("====================Error from getCompany")
 			return nil, err
 		} else {
 			companyBytes, err1 := json.Marshal(&company)
 			if err1 != nil {
-				fmt.Println("Error marshalling the company")
+				fmt.Println("===============Error marshalling the company")
 				return nil, err1
 			}
-			fmt.Println("All success, returning the company")
+			fmt.Println("===============All success, returning the company")
 			return companyBytes, nil
-		}*/
+		}
 	}
 	fmt.Printf("=========================Error in Query=====================")
 	return nil, errors.New("Invalid query function name. Expecting \"query\"")
