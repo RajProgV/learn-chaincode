@@ -300,9 +300,9 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 			return Avalbytes, nil
 			********************************************old function body*******************************************
 	*/
-
+	fmt.Printf("=========================In Query Method=====================")
 	if function == "query" {
-		fmt.Printf("Function is query =====================")
+		fmt.Printf("==================Function is query =====================")
 		//return nil, errors.New("Invalid query function name. Expecting \"query\"")
 		//}
 		var A string // Entities
@@ -353,7 +353,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 			return companyBytes, nil
 		}*/
 	}
-
+	fmt.Printf("=========================Error in Query=====================")
 	return nil, errors.New("Invalid query function name. Expecting \"query\"")
 
 }
