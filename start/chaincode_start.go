@@ -337,10 +337,8 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 			return nil, errors.New("Account not found " + args[0])
 		}
 
-		fmt.Println("C: ", len(companyBytes), companyBytes[:4])
-		g := CToGoString(companyBytes[:])
-		fmt.Println("Go:", len(g), g)
-
+		fmt.Println("===============================C: ", len(companyBytes), companyBytes[:4])
+		
 		err1 = json.Unmarshal(companyBytes, &company)
 		if err1 != nil {
 			fmt.Println("============Error unmarshalling account " + args[0] + "==== err:" + err1.Error())
@@ -567,13 +565,3 @@ var eigthDigit = map[int]string{
 }
 
 //===========================end============standard value=================================================
-func CToGoString(c []byte) string {
-    n := -1
-    for i, b := range c {
-        if b == 0 {
-            break
-        }
-        n = i
-    }
-    return string(c[:n+1])
-}
