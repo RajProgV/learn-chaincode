@@ -361,10 +361,10 @@ func main() {
 //===========================start============get company info=================================================
 func GetCompany(companyID string, stub shim.ChaincodeStubInterface) (Account, error) {
 	var company Account
-	fmt.Println("==============inside funtion GetCompany ==============")
+	fmt.Printf("==============inside funtion GetCompany ==============")
 	companyBytes, err := stub.GetState(accountPrefix + companyID)
 	if err != nil {
-		fmt.Println("============in funct========Account not found " + companyID)
+		fmt.Printf("============in funct========Account not found " + companyID)
 		return company, errors.New("Account not found " + companyID)
 	}
 
