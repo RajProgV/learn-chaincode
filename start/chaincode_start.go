@@ -330,6 +330,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 
 
 		var company Account
+		var companyBytes []byte
 		companyBytes, err1 := stub.GetState(accountPrefix + args[0])
 		if err1 != nil {
 			fmt.Println("Account not found " + args[0])
@@ -338,7 +339,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 
 		err1 = json.Unmarshal(companyBytes, &company)
 		if err1 != nil {
-			fmt.Println("Error unmarshalling account " + args[0] + "==== err:" + err1.Error())
+			fmt.Println("============Error unmarshalling account " + args[0] + "==== err:" + err1.Error())
 			//return nil, errors.New("Error unmarshalling account " + args[0])
 		} else if err1 == nil {
 			fmt.Println("values == %f", company.CashBalance)
