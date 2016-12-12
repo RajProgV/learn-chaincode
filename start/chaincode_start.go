@@ -341,9 +341,8 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 				fmt.Println("Error marshalling the company")
 				return nil, err1
 			}
-			jsonResp := company
-			fmt.Println("All success, returning the company :%s \n", jsonResp)
-			return companyBytes, nil
+			fmt.Println("All success, returning the company")
+			return "Hello=================", nil
 		}
 	}
 
