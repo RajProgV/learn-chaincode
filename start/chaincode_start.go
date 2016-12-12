@@ -590,7 +590,7 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 		return nil, errors.New("Error marshalling the toCompany")
 	}
 	fmt.Println("==============Put state on toCompany")
-	err = stub.PutState(accountPrefix + tr.ToCompany, toCompanyBytesToWrite)
+	err = stub.PutState(accountPrefix + args[0], toCompanyBytesToWrite)
 	if err != nil {
 		fmt.Println("===============Error writing the toCompany back")
 		return nil, errors.New("Error writing the toCompany back")
@@ -603,7 +603,7 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 		return nil, errors.New("Error marshalling the fromCompany")
 	}
 	fmt.Println("==============Put state on fromCompany")
-	err = stub.PutState(accountPrefix + tr.FromCompany, fromCompanyBytesToWrite)
+	err = stub.PutState(accountPrefix + args[1], fromCompanyBytesToWrite)
 	if err != nil {
 		fmt.Println("================Error writing the fromCompany back")
 		return nil, errors.New("Error writing the fromCompany back")
