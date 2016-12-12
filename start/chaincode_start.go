@@ -349,7 +349,6 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 	}
 	fmt.Printf("=========================Error in Query=====================")
 	return nil, errors.New("Invalid query function name. Expecting \"query\"")
-
 }
 
 func main() {
@@ -369,11 +368,11 @@ func GetCompany(companyID string, stub shim.ChaincodeStubInterface) (Account, er
 		return company, errors.New("Account not found " + companyID)
 	}
 
-	err = json.Unmarshal(companyBytes, &company)
+	/*err = json.Unmarshal(companyBytes, &company)
 	if err != nil {
 		fmt.Println("======in functn====Error unmarshalling account " + companyID + "\n err:" + err.Error())
 		return company, errors.New("Error unmarshalling account " + companyID)
-	}
+	}*/
 
 	return company, nil
 }
