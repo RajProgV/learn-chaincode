@@ -418,48 +418,48 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	var account = Account{ID: username, Prefix: prefix, CashBalance: 10000000.0, AssetsIds: assetIds}
 	accountBytes, err := json.Marshal(&account)
 	if err != nil {
-		fmt.Println("error creating account" + account.ID)
+		fmt.Println("===============error creating account" + account.ID)
 		return nil, errors.New("Error creating account " + account.ID)
 	}
 
-	fmt.Println("Attempting to get state of any existing account for " + account.ID)
+	fmt.Println("==============Attempting to get state of any existing account for " + account.ID + " =Prefix= " + account.Prefix )
 	existingBytes, err := stub.GetState(accountPrefix + account.ID)
 	if err == nil {
 
 		var company Account
 		err = json.Unmarshal(existingBytes, &company)
 		if err != nil {
-			fmt.Println("Error unmarshalling account " + account.ID + "\n--->: " + err.Error())
+			fmt.Println("===============Error unmarshalling account " + account.ID + "\n--->: " + err.Error())
 
 			if strings.Contains(err.Error(), "unexpected end") {
-				fmt.Println("No data means existing account found for " + account.ID + ", initializing account.")
+				fmt.Println("================No data means existing account found for " + account.ID + ", initializing account.")
 				err = stub.PutState(accountPrefix+account.ID, accountBytes)
 
 				if err == nil {
-					fmt.Println("created account" + accountPrefix + account.ID)
+					fmt.Println("================created account" + accountPrefix + account.ID)
 					return nil, nil
 				} else {
-					fmt.Println("failed to create initialize account for " + account.ID)
-					return nil, errors.New("failed to initialize an account for " + account.ID + " => " + err.Error())
+					fmt.Println("==============failed to create initialize account for " + account.ID)
+					return nil, errors.New("=============failed to initialize an account for " + account.ID + " => " + err.Error())
 				}
 			} else {
-				return nil, errors.New("Error unmarshalling existing account " + account.ID)
+				return nil, errors.New("================Error unmarshalling existing account " + account.ID)
 			}
 		} else {
-			fmt.Println("Account already exists for " + account.ID + " " + company.ID)
-			return nil, errors.New("Can't reinitialize existing user " + account.ID)
+			fmt.Println("=================Account already exists for " + account.ID + " " + company.ID)
+			return nil, errors.New("============Can't reinitialize existing user " + account.ID)
 		}
 	} else {
 
-		fmt.Println("No existing account found for " + account.ID + ", initializing account.")
+		fmt.Println("==============No existing account found for " + account.ID + ", initializing account.")
 		err = stub.PutState(accountPrefix+account.ID, accountBytes)
 
 		if err == nil {
-			fmt.Println("created account" + accountPrefix + account.ID)
+			fmt.Println("============created account" + accountPrefix + account.ID)
 			return nil, nil
 		} else {
-			fmt.Println("failed to create initialize account for " + account.ID)
-			return nil, errors.New("failed to initialize an account for " + account.ID + " => " + err.Error())
+			fmt.Println("==============failed to create initialize account for " + account.ID)
+			return nil, errors.New("===============failed to initialize an account for " + account.ID + " => " + err.Error())
 		}
 
 	}
