@@ -568,7 +568,11 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 		return nil, errors.New("Error unmarshalling account " + args[1])
 	}
 
-	amountToBeTransferred = strconv.ParseFloat(args[2],64)
+	amountToBeTransferred,err := strconv.ParseFloat(args[2],64)
+	if err != nil {
+		fmt.Println("Error converting amount to float " + args[2])
+		return nil, errors.New("Error converting amount to float " + args[2])
+	}
 
 	// If toCompany doesn't have enough cash to buy the papers
 	if toCompany.CashBalance < amountToBeTransferred {
