@@ -26,7 +26,7 @@ import (
 	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
-	//"https://github.com/test56tester28tt/fabric/core/chaincode/shim"
+	//"github.com/test56tester28tt/hyperledger/fabric/core/chaincode/shim"
 )
 
 // SimpleChaincode example simple Chaincode implementation
@@ -195,7 +195,7 @@ func (t *SimpleChaincode) delete(stub shim.ChaincodeStubInterface, args []string
 // Invoke callback representing the invocation of a chaincode
 // This chaincode will manage two accounts A and B and will transfer X units from A to B upon invoke
 func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
-	fmt.Printf("=========================Invoke called, determining function")
+	fmt.Printf("=========================Invoke called, determining function==========val = = " + function)
 
 	// Handle different functions
 	if function == "invoke" {
@@ -214,7 +214,8 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		fmt.Printf("=========================Function is delete")
 		return t.createAccount(stub, args)
 	} else if function == "transaction" {
-		//return t.transferPaper(stub, args)
+		fmt.Printf("=========================Function is transaction")
+		return t.transaction(stub, args)
 	}
 
 	return nil, errors.New("Received unknown function invocation")
