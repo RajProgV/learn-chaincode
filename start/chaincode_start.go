@@ -531,29 +531,29 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 	}
 
 	var fromCompany Account
-	fmt.Println("Getting State on fromCompany " + args[0])
+	fmt.Println("==============Getting State on fromCompany " + args[0])
 	fromCompanyBytes, err := stub.GetState(accountPrefix + args[0])
 	if err != nil {
-		fmt.Println("Account not found " + args[0])
+		fmt.Println("===================Account not found " + args[0])
 		return nil, errors.New("Account not found " + args[0])
 	}
 
-	fmt.Println("Unmarshalling FromCompany ")
+	fmt.Println("===============Unmarshalling FromCompany ")
 	err = json.Unmarshal(fromCompanyBytes, &fromCompany)
 	if err != nil {
-		fmt.Println("Error unmarshalling account " + args[1])
+		fmt.Println("===================Error unmarshalling account " + args[1])
 		return nil, errors.New("Error unmarshalling account " + args[0])
 	}
 
 	var toCompany Account
-	fmt.Println("Getting State on ToCompany " + args[1])
+	fmt.Println("=====================Getting State on ToCompany " + args[1])
 	toCompanyBytes, err := stub.GetState(accountPrefix + args[1])
 	if err != nil {
 		fmt.Println("Account not found " + args[1])
 		return nil, errors.New("Account not found " + args[1])
 	}
 
-	fmt.Println("Unmarshalling tocompany")
+	fmt.Println("==================Unmarshalling tocompany")
 	err = json.Unmarshal(toCompanyBytes, &toCompany)
 	if err != nil {
 		fmt.Println("Error unmarshalling account " + args[1])
@@ -562,8 +562,8 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 
 	amountToBeTransferred, err := strconv.ParseFloat(args[2], 64)
 	if err != nil {
-		fmt.Println("Error converting amount to float " + args[2])
-		return nil, errors.New("Error converting amount to float " + args[2])
+		fmt.Println("===================Error converting amount to float " + args[2])
+		return nil, errors.New("==============Error converting amount to float " + args[2])
 	}
 
 	// If toCompany doesn't have enough cash to buy the papers
