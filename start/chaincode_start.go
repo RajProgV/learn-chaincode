@@ -22,8 +22,8 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"time"
 	"strings"
+	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	//"https://github.com/test56tester28tt/fabric/core/chaincode/shim"
@@ -72,9 +72,9 @@ func msToTime(ms string) (time.Time, error) {
 }
 
 type Account struct {
-	ID          string   `json:"id"`
-	Prefix      string   `json:"prefix"`
-	CashBalance float64  `json:"cashBalance"`
+	ID          string  `json:"id"`
+	Prefix      string  `json:"prefix"`
+	CashBalance float64 `json:"cashBalance"`
 }
 
 //===========end======added for account creation ================
@@ -120,8 +120,6 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 // Transaction makes payment of X units from A to B
 func (t *SimpleChaincode) invoke(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Printf("=========================Running invoke")
-
-
 
 	var A, B string    // Entities
 	var Aval, Bval int // Asset holdings
@@ -215,7 +213,7 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		// Deletes an entity from its state
 		fmt.Printf("=========================Function is delete")
 		return t.createAccount(stub, args)
-	}else if function == "transaction" {
+	} else if function == "transaction" {
 		//return t.transferPaper(stub, args)
 	}
 
@@ -278,7 +276,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 			return Avalbytes, nil
 			********************************************old function body*******************************************
 	*/
-	fmt.Printf("=========================In Query Method=====================val = "+function+"====")
+	fmt.Printf("=========================In Query Method=====================val = " + function + "====")
 	if function == "query" {
 		fmt.Printf("==================Function is query =====================")
 		//return nil, errors.New("Invalid query function name. Expecting \"query\"")
@@ -307,7 +305,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		jsonResp := "{\"Name\":\"" + A + "\",\"Amount\":\"" + string(Avalbytes) + "\"}"
 		fmt.Printf("Query Response =============:%s\n", jsonResp)
 		return Avalbytes, nil
-	}  else if function == "GetCompany" {
+	} else if function == "GetCompany" {
 		fmt.Println("Getting the company")
 		company, err := GetCompany(args[0], stub)
 		if err != nil {
@@ -322,7 +320,7 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 			fmt.Println("All success, returning the company")
 			return companyBytes, nil
 		}
-	} 
+	}
 	fmt.Printf("=========================Error in Query=====================")
 	return nil, errors.New("Invalid query function name. Expecting \"query\"")
 }
@@ -352,7 +350,6 @@ func GetCompany(companyID string, stub shim.ChaincodeStubInterface) (Account, er
 	return company, nil
 }
 
-
 //===========================end============get company info=================================================
 
 //===========================start============Account creation=================================================
@@ -369,14 +366,14 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	// Build an account object for the user
 	suffix := "000A"
 	prefix := username + suffix
-	var account = Account{ID: username, Prefix: prefix, CashBalance: 10000000.0}
+	var account = Account{ID: username, Prefix: prefix, CashBalance: 100000.0}
 	accountBytes, err := json.Marshal(&account)
 	if err != nil {
 		fmt.Println("===============error creating account" + account.ID)
 		return nil, errors.New("Error creating account " + account.ID)
 	}
 
-	fmt.Println("==============Attempting to get state of any existing account for " + account.ID + " =Prefix= " + account.Prefix )
+	fmt.Println("==============Attempting to get state of any existing account for " + account.ID + " =Prefix= " + account.Prefix)
 	existingBytes, err := stub.GetState(accountPrefix + account.ID)
 	if err == nil {
 
@@ -442,7 +439,7 @@ func (t *SimpleChaincode) createAccounts(stub shim.ChaincodeStubInterface, args 
 		} else {
 			prefix = strconv.Itoa(counter) + suffix
 		}
-		account = Account{ID: "company" + strconv.Itoa(counter), Prefix: prefix, CashBalance: 10000000.0}
+		account = Account{ID: "company" + strconv.Itoa(counter), Prefix: prefix, CashBalance: 100000.0}
 		accountBytes, err := json.Marshal(&account)
 		if err != nil {
 			fmt.Println("error creating account" + account.ID)
@@ -525,16 +522,13 @@ var eigthDigit = map[int]string{
 
 //===========================end============standard value=================================================
 
-
-
 //===========================start============transaction function=================================================
 func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Println("====================Transferring amount to user.")
-	
+
 	if len(args) != 3 {
 		return nil, errors.New("Incorrect number of arguments. Expecting commercial paper record")
 	}
-
 
 	var fromCompany Account
 	fmt.Println("Getting State on fromCompany " + args[0])
@@ -566,7 +560,7 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 		return nil, errors.New("Error unmarshalling account " + args[1])
 	}
 
-	amountToBeTransferred,err := strconv.ParseFloat(args[2],64)
+	amountToBeTransferred, err := strconv.ParseFloat(args[2], 64)
 	if err != nil {
 		fmt.Println("Error converting amount to float " + args[2])
 		return nil, errors.New("Error converting amount to float " + args[2])
@@ -583,7 +577,6 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 	toCompany.CashBalance -= amountToBeTransferred
 	fromCompany.CashBalance += amountToBeTransferred
 
-
 	// Write everything back
 	// To Company
 	toCompanyBytesToWrite, err := json.Marshal(&toCompany)
@@ -592,7 +585,7 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 		return nil, errors.New("Error marshalling the toCompany")
 	}
 	fmt.Println("==============Put state on toCompany")
-	err = stub.PutState(accountPrefix + args[0], toCompanyBytesToWrite)
+	err = stub.PutState(accountPrefix+args[0], toCompanyBytesToWrite)
 	if err != nil {
 		fmt.Println("===============Error writing the toCompany back")
 		return nil, errors.New("Error writing the toCompany back")
@@ -605,7 +598,7 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 		return nil, errors.New("Error marshalling the fromCompany")
 	}
 	fmt.Println("==============Put state on fromCompany")
-	err = stub.PutState(accountPrefix + args[1], fromCompanyBytesToWrite)
+	err = stub.PutState(accountPrefix+args[1], fromCompanyBytesToWrite)
 	if err != nil {
 		fmt.Println("================Error writing the fromCompany back")
 		return nil, errors.New("Error writing the fromCompany back")
@@ -614,4 +607,5 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 	fmt.Println("Successfully completed Invoke")
 	return nil, nil
 }
+
 //===========================start============transaction function=================================================
