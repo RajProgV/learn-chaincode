@@ -414,7 +414,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 			return nil, nil
 		} else {
 			fmt.Println("==============failed to create initialize account for " + account.ID)
-			return nil, errors.New("===============failed to initialize an account for " + account.ID + " => " + err.Error())
+			return accountBytes, errors.New("===============failed to initialize an account for " + account.ID + " => " + err.Error())
 		}
 
 	}
