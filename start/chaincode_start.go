@@ -33,6 +33,12 @@ import (
 type SimpleChaincode struct {
 }
 
+type Account struct {
+	ID          string  `json:"id"`
+	Prefix      string  `json:"prefix"`
+	CashBalance float64 `json:"cashBalance"`
+}
+
 //============start==========added globle var===============
 var cpPrefix = "cp:"
 var accountPrefix = "acct:"
@@ -71,18 +77,15 @@ func msToTime(ms string) (time.Time, error) {
 		(msInt%millisPerSecond)*nanosPerMillisecond), nil
 }
 
-type Account struct {
-	ID          string  `json:"id"`
-	Prefix      string  `json:"prefix"`
-	CashBalance float64 `json:"cashBalance"`
-}
-
 //===========end======added for account creation ================
 
 func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Printf("========================= Init called, initializing chaincode")
 
-	var A, B string    // Entities
+	if len(args) = 0 {
+		return nil, errors.New("Incorrect number of arguments. Expecting 4")
+	}
+	/*var A, B string    // Entities
 	var Aval, Bval int // Asset holdings
 	var err error
 
@@ -112,7 +115,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	err = stub.PutState(B, []byte(strconv.Itoa(Bval)))
 	if err != nil {
 		return nil, err
-	}
+	}*/
 
 	return nil, nil
 }
@@ -395,7 +398,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 					return nil, errors.New("=============failed to initialize an account for " + account.ID + " => " + err.Error())
 				}
 			} else {
-				return nil, errors.New("================Error unmarshalling existing account " + account.ID)
+				return nil, errors.New("Error unmarshalling existing account " + account.ID)
 			}
 		} else {
 			fmt.Println("=================Account already exists for " + account.ID + " " + company.ID)
