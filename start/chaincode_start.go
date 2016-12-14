@@ -392,7 +392,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 
 				if err == nil {
 					fmt.Println("================created account" + accountPrefix + account.ID)
-					return nil, nil
+					return accountBytes, nil
 				} else {
 					fmt.Println("==============failed to create initialize account for " + account.ID)
 					return nil, errors.New("=============failed to initialize an account for " + account.ID + " => " + err.Error())
@@ -402,7 +402,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 			}
 		} else {
 			fmt.Println("=================Account already exists for " + account.ID + " " + company.ID)
-			return nil, errors.New("============Can't reinitialize existing user " + account.ID)
+			return accountBytes, errors.New("============Can't reinitialize existing user " + account.ID)
 		}
 	} else {
 
@@ -411,10 +411,10 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 
 		if err == nil {
 			fmt.Println("============created account" + accountPrefix + account.ID)
-			return nil, nil
+			return accountBytes, nil
 		} else {
 			fmt.Println("==============failed to create initialize account for " + account.ID)
-			return accountBytes, errors.New("===============failed to initialize an account for " + account.ID + " => " + err.Error())
+			return nil, errors.New("===============failed to initialize an account for " + account.ID + " => " + err.Error())
 		}
 
 	}
