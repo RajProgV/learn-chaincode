@@ -82,7 +82,7 @@ func msToTime(ms string) (time.Time, error) {
 func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
 	fmt.Printf("========================= Init called, initializing chaincode")
 
-	if len(args) = 0 {
+	if len(args) == 0 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 4")
 	}
 	/*var A, B string    // Entities
