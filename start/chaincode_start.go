@@ -570,12 +570,12 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 		return nil, errors.New("==============Error converting amount to float " + args[2])
 	}
 
-	// If toCompany doesn't have enough cash to buy the papers
-	if toCompany.CashBalance < amountToBeTransferred {
+	// If fromCompany doesn't have enough cash to buy the papers
+	if fromCompany.CashBalance < amountToBeTransferred {
 		fmt.Println("===============The company " + args[1] + "doesn't have enough cash to complete the transaction")
 		return nil, errors.New("The company " + args[0] + "doesn't have enough cash to complete the transaction")
 	} else {
-		fmt.Println("===================The ToCompany has enough money to be transferred for this paper")
+		fmt.Println("===================The fromCompany has enough money to be transferred amount = " + args[2] + "==========")
 	}
 
 	toCompany.CashBalance += amountToBeTransferred
@@ -589,7 +589,7 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 		fmt.Println("=============Error marshalling the toCompany")
 		return nil, errors.New("Error marshalling the toCompany")
 	}
-	fmt.Println("==============Put state on toCompany==================")
+	fmt.Println("==============Put state on toCompany========amt = " + string(toCompany.CashBalance) + "==========")
 	err = stub.PutState(accountPrefix+args[0], toCompanyBytesToWrite)
 	if err != nil {
 		fmt.Println("===============Error writing the toCompany back")
@@ -603,7 +603,7 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 		fmt.Println("===============Error marshalling the fromCompany=================")
 		return nil, errors.New("Error marshalling the fromCompany")
 	}
-	fmt.Println("==============Put state on fromCompany")
+	fmt.Println("==============Put state on fromCompany amt = " + string(fromCompany.CashBalance) + "==============")
 	err = stub.PutState(accountPrefix+args[1], fromCompanyBytesToWrite)
 	if err != nil {
 		fmt.Println("================Error writing the fromCompany back")
