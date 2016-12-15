@@ -41,6 +41,7 @@ type Account struct {
 
 //============start==========added globle var===============
 var cpPrefix = "cp:"
+var cpPrefixTest = "cptest:"
 var accountPrefix = "acct:"
 
 //============end==========added globle var===============
