@@ -528,39 +528,39 @@ var eigthDigit = map[int]string{
 
 //===========================start============transaction function=================================================
 func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
-	fmt.Println("====================Transferring amount to user.")
+	fmt.Println("====================Transferring amount to user.=========================")
 
 	if len(args) != 3 {
 		return nil, errors.New("Incorrect number of arguments. Expecting commercial paper record")
 	}
 
 	var fromCompany Account
-	fmt.Println("==============Getting State on fromCompany " + args[0])
+	fmt.Println("==============Getting State on fromCompany " + args[0] + "================")
 	fromCompanyBytes, err := stub.GetState(accountPrefix + args[0])
 	if err != nil {
-		fmt.Println("===================Account not found " + args[0])
+		fmt.Println("===================Account not found " + args[0] + "================")
 		return nil, errors.New("Account not found " + args[0])
 	}
 
-	fmt.Println("===============Unmarshalling FromCompany ")
+	fmt.Println("===============Unmarshalling FromCompany ================")
 	err = json.Unmarshal(fromCompanyBytes, &fromCompany)
 	if err != nil {
-		fmt.Println("===================Error unmarshalling account " + args[1])
+		fmt.Println("===================Error unmarshalling account " + args[0])
 		return nil, errors.New("Error unmarshalling account " + args[0])
 	}
 
 	var toCompany Account
-	fmt.Println("=====================Getting State on ToCompany " + args[1])
+	fmt.Println("=====================Getting State on ToCompany " + args[1] + "================")
 	toCompanyBytes, err := stub.GetState(accountPrefix + args[1])
 	if err != nil {
-		fmt.Println("Account not found " + args[1])
+		fmt.Println("Account not found " + args[1] + "================")
 		return nil, errors.New("Account not found " + args[1])
 	}
 
-	fmt.Println("==================Unmarshalling tocompany")
+	fmt.Println("==================Unmarshalling tocompany================")
 	err = json.Unmarshal(toCompanyBytes, &toCompany)
 	if err != nil {
-		fmt.Println("Error unmarshalling account " + args[1])
+		fmt.Println("Error unmarshalling account " + args[1] + "================")
 		return nil, errors.New("Error unmarshalling account " + args[1])
 	}
 
@@ -578,17 +578,18 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 		fmt.Println("===================The ToCompany has enough money to be transferred for this paper")
 	}
 
-	toCompany.CashBalance -= amountToBeTransferred
-	fromCompany.CashBalance += amountToBeTransferred
+	toCompany.CashBalance += amountToBeTransferred
+	fromCompany.CashBalance -= amountToBeTransferred
 
 	// Write everything back
 	// To Company
+	fmt.Println("============= marshalling the toCompany=================")
 	toCompanyBytesToWrite, err := json.Marshal(&toCompany)
 	if err != nil {
 		fmt.Println("=============Error marshalling the toCompany")
 		return nil, errors.New("Error marshalling the toCompany")
 	}
-	fmt.Println("==============Put state on toCompany")
+	fmt.Println("==============Put state on toCompany==================")
 	err = stub.PutState(accountPrefix+args[0], toCompanyBytesToWrite)
 	if err != nil {
 		fmt.Println("===============Error writing the toCompany back")
@@ -596,9 +597,10 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 	}
 
 	// From company
+	fmt.Println("============= marshalling the fromCompany=================")
 	fromCompanyBytesToWrite, err := json.Marshal(&fromCompany)
 	if err != nil {
-		fmt.Println("===============Error marshalling the fromCompany")
+		fmt.Println("===============Error marshalling the fromCompany=================")
 		return nil, errors.New("Error marshalling the fromCompany")
 	}
 	fmt.Println("==============Put state on fromCompany")
@@ -608,7 +610,7 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 		return nil, errors.New("Error writing the fromCompany back")
 	}
 
-	fmt.Println("Successfully completed Invoke")
+	fmt.Println("==================***=== Successfully Transaction completed ====***====================")
 	return nil, nil
 }
 
