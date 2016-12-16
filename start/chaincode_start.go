@@ -371,13 +371,13 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	usertype := args[1]
 	suffix := ""
 	if usertype == "ADMIN" {
-		suffix := "000A"
+		suffix = "000A"
 	} else if usertype == "CORPORATE" {
-		suffix := "000C"
+		suffix = "000C"
 	} else if usertype == "NGO" {
-		suffix := "000N"
+		suffix = "000N"
 	} else if usertype == "VENDOR" {
-		suffix := "000V"
+		suffix = "000V"
 	} else {
 		fmt.Println("====================Error obtaining account type")
 		return nil, errors.New("Invalid account type")
@@ -389,7 +389,7 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 		return nil, errors.New("Invalid Amount " + args[2] + " for " + username)
 	}
 	// Build an account object for the user
-	prefix := username + suffix
+	prefix = username + suffix
 	var account = Account{ID: username, Prefix: prefix, CashBalance: amount}
 	accountBytes, err := json.Marshal(&account)
 	if err != nil {
