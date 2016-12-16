@@ -208,14 +208,15 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return t.invoke(stub, args)
 	} else if function == "init" {
 		fmt.Printf("=========================Function is init")
-		return t.Init(stub, function, args)
+		//return t.Init(stub, function, args)
+		return nil, nil
 	} else if function == "delete" {
 		// Deletes an entity from its state
 		fmt.Printf("=========================Function is delete")
 		return t.delete(stub, args)
 	} else if function == "createAccount" {
 		// Deletes an entity from its state
-		fmt.Printf("=========================Function is delete")
+		fmt.Printf("=========================Function is createAccount")
 		return t.createAccount(stub, args)
 	} else if function == "transaction" {
 		fmt.Printf("=========================Function is transaction")
@@ -234,14 +235,14 @@ func (t *SimpleChaincode) Run(stub shim.ChaincodeStubInterface, function string,
 		fmt.Printf("=========================Function is invoke")
 		return t.invoke(stub, args)
 	} else if function == "init" {
-		fmt.Printf("=========================Function is init")
-		return t.Init(stub, function, args)
+		fmt.Printf("=========================Function is init === calling createAccount function ==")
+		//return t.Init(stub, function, args)
+		return t.createAccount(stub, function, args)
 	} else if function == "delete" {
 		// Deletes an entity from its state
 		fmt.Printf("=========================Function is delete")
 		return t.delete(stub, args)
 	}
-
 	return nil, errors.New("Received unknown function invocation")
 }
 
@@ -315,12 +316,12 @@ func (t *SimpleChaincode) Query(stub shim.ChaincodeStubInterface, function strin
 		company, err := GetCompany(args[0], stub)
 		if err != nil {
 			fmt.Println("Error from getCompany")
-			return nil, err
+			return nil, errors.New("User Does not exist")
 		} else {
 			companyBytes, err1 := json.Marshal(&company)
 			if err1 != nil {
 				fmt.Println("Error marshalling the company")
-				return nil, err1
+				return nil, errors.New("User Does not exist")
 			}
 			fmt.Println("All success, returning the company")
 			return companyBytes, nil
@@ -343,7 +344,7 @@ func GetCompany(companyID string, stub shim.ChaincodeStubInterface) (Account, er
 	companyBytes, err := stub.GetState(accountPrefix + companyID)
 	if err != nil {
 		fmt.Println("Account not found " + companyID)
-		return company, errors.New("Account not found " + companyID)
+		return company, errors.New("Account not found for " + companyID)
 	}
 
 	err = json.Unmarshal(companyBytes, &company)
@@ -362,28 +363,46 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 	fmt.Println("Creating account")
 
 	// Obtain the username to associate with the account
-	if len(args) != 1 {
-		fmt.Println("Error obtaining username")
-		return nil, errors.New("createAccount accepts a single username argument")
+	if len(args) != 3 {
+		fmt.Println("====================Error obtaining username")
+		return nil, errors.New("Invalid number of argument")
 	}
 	username := args[0]
+	usertype := args[1]
+	suffix := ""
+	if usertype == "ADMIN" {
+		suffix := "000A"
+	} else if usertype == "CORPORATE" {
+		suffix := "000C"
+	} else if usertype == "NGO" {
+		suffix := "000N"
+	} else if usertype == "VENDOR" {
+		suffix := "000V"
+	} else {
+		fmt.Println("====================Error obtaining account type")
+		return nil, errors.New("Invalid account type")
+	}
 
+	amount, err := strconv.ParseFloat(args[2], 64)
+	if err != nil {
+		fmt.Println("===============Invalid Amount" + username)
+		return nil, errors.New("Invalid Amount " + args[2] + " for " + username)
+	}
 	// Build an account object for the user
-	suffix := "000A"
 	prefix := username + suffix
-	var account = Account{ID: username, Prefix: prefix, CashBalance: 100000.0}
+	var account = Account{ID: username, Prefix: prefix, CashBalance: amount}
 	accountBytes, err := json.Marshal(&account)
 	if err != nil {
 		fmt.Println("===============error creating account" + account.ID)
-		return nil, errors.New("Error creating account " + account.ID)
+		return nil, errors.New("Error creating account for " + account.ID)
 	}
 
 	fmt.Println("==============Attempting to get state of any existing account for " + account.ID + " =Prefix= " + account.Prefix)
 	existingBytes, err := stub.GetState(accountPrefix + account.ID)
 	if err == nil {
 
-		var company Account
-		err = json.Unmarshal(existingBytes, &company)
+		var useracct Account
+		err = json.Unmarshal(existingBytes, &useracct)
 		if err != nil {
 			fmt.Println("===============Error unmarshalling account " + account.ID + "\n--->: " + err.Error())
 
@@ -396,14 +415,14 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 					return accountBytes, nil
 				} else {
 					fmt.Println("==============failed to create initialize account for " + account.ID)
-					return nil, errors.New("=============failed to initialize an account for " + account.ID + " => " + err.Error())
+					return nil, errors.New("Failed to initialize an account for " + account.ID + " => " + err.Error())
 				}
 			} else {
-				return nil, errors.New("Error unmarshalling existing account " + account.ID)
+				return nil, errors.New("Error while obtaining existing account " + account.ID)
 			}
 		} else {
-			fmt.Println("=================Account already exists for " + account.ID + " " + company.ID)
-			return accountBytes, errors.New("============Can't reinitialize existing user " + account.ID)
+			fmt.Println("=================Account already exists for " + useracct.ID + " " + useracct.ID)
+			return nil, errors.New("Account already existing for user " + account.ID)
 		}
 	} else {
 
@@ -415,14 +434,14 @@ func (t *SimpleChaincode) createAccount(stub shim.ChaincodeStubInterface, args [
 			return accountBytes, nil
 		} else {
 			fmt.Println("==============failed to create initialize account for " + account.ID)
-			return nil, errors.New("===============failed to initialize an account for " + account.ID + " => " + err.Error())
+			return nil, errors.New("Failed to initialize an account for " + account.ID + " => " + err.Error())
 		}
 
 	}
 
 }
 
-func (t *SimpleChaincode) createAccounts(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+/*func (t *SimpleChaincode) createAccounts(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Println("Creating accounts")
 
 	//  				0
@@ -458,7 +477,7 @@ func (t *SimpleChaincode) createAccounts(stub shim.ChaincodeStubInterface, args 
 	fmt.Println("Accounts created")
 	return nil, nil
 
-}
+}*/
 
 //===========================end============Account creation=================================================
 
