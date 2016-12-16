@@ -237,7 +237,7 @@ func (t *SimpleChaincode) Run(stub shim.ChaincodeStubInterface, function string,
 	} else if function == "init" {
 		fmt.Printf("=========================Function is init === calling createAccount function ==")
 		//return t.Init(stub, function, args)
-		return t.createAccount(stub, function, args)
+		return t.createAccount(stub, args)
 	} else if function == "delete" {
 		// Deletes an entity from its state
 		fmt.Printf("=========================Function is delete")
