@@ -86,22 +86,22 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	/*if len(args) == 0 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 4")
 	}*/
-	var A, B string    // Entities
+	/*var A, B string    // Entities
 	var Aval, Bval int // Asset holdings
-	var err error
+	var err error*/
 
 	if len(args) != 4 {
 		return nil, errors.New("Incorrect number of arguments. Expecting 4")
 	}
 
 	// Initialize the chaincode
-	A = args[0]
-	Aval, err = strconv.Atoi(args[1])
+	A := args[0]
+	Aval, err := strconv.Atoi(args[1])
 	if err != nil {
 		return nil, errors.New("Expecting integer value for asset holding")
 	}
-	B = args[2]
-	Bval, err = strconv.Atoi(args[3])
+	B := args[2]
+	Bval, err := strconv.Atoi(args[3])
 	if err != nil {
 		return nil, errors.New("Expecting integer value for asset holding")
 	}
