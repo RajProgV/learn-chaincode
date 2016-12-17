@@ -108,7 +108,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	fmt.Printf("=========================Aval = %d, Bval = %d\n", Aval, Bval)
 
 	// Write the state to the ledger
-	err = stub.PutState(A, []byte(strconv.Itoa(Aval)))
+	/*err = stub.PutState(A, []byte(strconv.Itoa(Aval)))
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (t *SimpleChaincode) Init(stub shim.ChaincodeStubInterface, function string
 	err = stub.PutState(B, []byte(strconv.Itoa(Bval)))
 	if err != nil {
 		return nil, err
-	}
+	}*/
 
 	return nil, nil
 }
@@ -208,8 +208,7 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 		return t.invoke(stub, args)
 	} else if function == "init" {
 		fmt.Printf("=========================Function is init")
-		//return t.Init(stub, function, args)
-		return nil, nil
+		return t.Init(stub, function, args)
 	} else if function == "delete" {
 		// Deletes an entity from its state
 		fmt.Printf("=========================Function is delete")
@@ -236,8 +235,7 @@ func (t *SimpleChaincode) Run(stub shim.ChaincodeStubInterface, function string,
 		return t.invoke(stub, args)
 	} else if function == "init" {
 		fmt.Printf("=========================Function is init in Run === calling createAccount function ==")
-		//return t.Init(stub, function, args)
-		return t.createAccount(stub, args)
+		return t.Init(stub, function, args)
 	} else if function == "delete" {
 		// Deletes an entity from its state
 		fmt.Printf("=========================Function is delete")
