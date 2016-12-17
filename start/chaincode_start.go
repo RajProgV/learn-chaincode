@@ -549,35 +549,35 @@ var eigthDigit = map[int]string{
 func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Println("====================Transferring amount to user.=========================")
 
-	if len(args) != 3 {
+	if len(args) != 4 {
 		return nil, errors.New("Incorrect number of arguments. Expecting commercial paper record")
 	}
 
-	var fromCompany Account
-	fmt.Println("==============Getting State on fromCompany " + args[0] + "================")
-	fromCompanyBytes, err := stub.GetState(accountPrefix + args[0])
+	var fromUser Account
+	fmt.Println("==============Getting State on fromUser " + args[0] + "================")
+	fromUserBytes, err := stub.GetState(accountPrefix + args[0])
 	if err != nil {
 		fmt.Println("===================Account not found " + args[0] + "================")
 		return nil, errors.New("Account not found " + args[0])
 	}
 
 	fmt.Println("===============Unmarshalling FromCompany ================")
-	err = json.Unmarshal(fromCompanyBytes, &fromCompany)
+	err = json.Unmarshal(fromUserBytes, &fromUser)
 	if err != nil {
 		fmt.Println("===================Error unmarshalling account " + args[0])
 		return nil, errors.New("Error unmarshalling account " + args[0])
 	}
 
-	var toCompany Account
+	var toUser Account
 	fmt.Println("=====================Getting State on ToCompany " + args[1] + "================")
-	toCompanyBytes, err := stub.GetState(accountPrefix + args[1])
+	toUserBytes, err := stub.GetState(accountPrefix + args[1])
 	if err != nil {
 		fmt.Println("Account not found " + args[1] + "================")
 		return nil, errors.New("Account not found " + args[1])
 	}
 
 	fmt.Println("==================Unmarshalling tocompany================")
-	err = json.Unmarshal(toCompanyBytes, &toCompany)
+	err = json.Unmarshal(toUserBytes, &toUser)
 	if err != nil {
 		fmt.Println("Error unmarshalling account " + args[1] + "================")
 		return nil, errors.New("Error unmarshalling account " + args[1])
@@ -590,26 +590,26 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 	}
 
 	// If fromCompany doesn't have enough cash to buy the papers
-	if fromCompany.CashBalance < amountToBeTransferred {
+	if fromUser.CashBalance < amountToBeTransferred {
 		fmt.Println("===============The company " + args[1] + "doesn't have enough cash to complete the transaction")
 		return nil, errors.New("The company " + args[0] + "doesn't have enough cash to complete the transaction")
 	} else {
 		fmt.Println("===================The fromCompany has enough money to be transferred amount = " + args[2] + "==========")
 	}
 
-	toCompany.CashBalance += amountToBeTransferred
-	fromCompany.CashBalance -= amountToBeTransferred
+	toUser.CashBalance += amountToBeTransferred
+	fromUser.CashBalance -= amountToBeTransferred
 
 	// Write everything back
 	// To Company
 	fmt.Println("============= marshalling the toCompany=================")
-	toCompanyBytesToWrite, err := json.Marshal(&toCompany)
+	toUserBytesToWrite, err := json.Marshal(&toUser)
 	if err != nil {
 		fmt.Println("=============Error marshalling the toCompany")
 		return nil, errors.New("Error marshalling the toCompany")
 	}
-	fmt.Println("==============Put state on toCompany========amt = %f " + strconv.FormatFloat(toCompany.CashBalance, 'f', 6, 64) + "==========")
-	err = stub.PutState(accountPrefix+args[0], toCompanyBytesToWrite)
+	fmt.Println("==============Put state on toCompany========amt = %f " + strconv.FormatFloat(toUser.CashBalance, 'f', 6, 64) + "==========")
+	err = stub.PutState(accountPrefix+args[0], toUserBytesToWrite)
 	if err != nil {
 		fmt.Println("===============Error writing the toCompany back")
 		return nil, errors.New("Error writing the toCompany back")
@@ -617,13 +617,13 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 
 	// From company
 	fmt.Println("============= marshalling the fromCompany=================")
-	fromCompanyBytesToWrite, err := json.Marshal(&fromCompany)
+	fromUserBytesToWrite, err := json.Marshal(&fromUser)
 	if err != nil {
 		fmt.Println("===============Error marshalling the fromCompany=================")
 		return nil, errors.New("Error marshalling the fromCompany")
 	}
-	fmt.Println("==============Put state on fromCompany amt = %f" + strconv.FormatFloat(fromCompany.CashBalance, 'f', 6, 64) + "==============")
-	err = stub.PutState(accountPrefix+args[1], fromCompanyBytesToWrite)
+	fmt.Println("==============Put state on fromCompany amt = %f" + strconv.FormatFloat(fromUser.CashBalance, 'f', 6, 64) + "==============")
+	err = stub.PutState(accountPrefix+args[1], fromUserBytesToWrite)
 	if err != nil {
 		fmt.Println("================Error writing the fromCompany back")
 		return nil, errors.New("Error writing the fromCompany back")
