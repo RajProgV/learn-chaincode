@@ -235,7 +235,7 @@ func (t *SimpleChaincode) Run(stub shim.ChaincodeStubInterface, function string,
 		fmt.Printf("=========================Function is invoke")
 		return t.invoke(stub, args)
 	} else if function == "init" {
-		fmt.Printf("=========================Function is init === calling createAccount function ==")
+		fmt.Printf("=========================Function is init in Run === calling createAccount function ==")
 		//return t.Init(stub, function, args)
 		return t.createAccount(stub, args)
 	} else if function == "delete" {
