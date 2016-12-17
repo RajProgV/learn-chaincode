@@ -642,7 +642,7 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 func (t *SimpleChaincode) adminamtupdate(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
 	fmt.Println("====================Admin Amount Update.=========================")
 
-	if len(args) != 4 {
+	if len(args) != 2 {
 		return nil, errors.New("Incorrect number of arguments. Expecting commercial paper record")
 	}
 	var fromUser Account
