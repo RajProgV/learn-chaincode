@@ -633,4 +633,61 @@ func (t *SimpleChaincode) transaction(stub shim.ChaincodeStubInterface, args []s
 	return nil, nil
 }
 
-//===========================start============transaction function=================================================
+//===========================end============transaction function=================================================
+
+//===========================start============admin amount update function=================================================
+func (t *SimpleChaincode) adminamtupdate(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+	fmt.Println("====================Admin Amount Update.=========================")
+
+	if len(args) != 4 {
+		return nil, errors.New("Incorrect number of arguments. Expecting commercial paper record")
+	}
+	var fromUser Account
+	fmt.Println("==============Getting State on fromUser " + args[0] + "================")
+	fromUserBytes, err := stub.GetState(accountPrefix + args[0])
+	if err != nil {
+		fmt.Println("===================Account not found " + args[0] + "================")
+		return nil, errors.New("Account not found " + args[0])
+	}
+
+	fmt.Println("===============Unmarshalling fromUser ================")
+	err = json.Unmarshal(fromUserBytes, &fromUser)
+	if err != nil {
+		fmt.Println("===================Error unmarshalling account " + args[0])
+		return nil, errors.New("Error unmarshalling account " + args[0])
+	}
+
+	n := len(fromUser.Prefix)
+
+	if fromUser.Prefix[n-1] != "A" {
+		fmt.Println("===================Invalid request")
+		return nil, errors.New("Invalid Reuest to update amount for " + args[0])
+	}
+
+	amountToBeupdated, err := strconv.ParseFloat(args[1], 64)
+
+	if amountToBeupdated <= 0.0 {
+		fmt.Println("===============Invalid Amount ================")
+		return nil, errors.New("Invalid Amount value")
+	}
+
+	fromUser.CashBalance = amountToBeupdated
+
+	fmt.Println("============= marshalling the user=================")
+	toUserBytesToWrite, err := json.Marshal(&fromUser)
+	if err != nil {
+		fmt.Println("=============Error marshalling the toCompany")
+		return nil, errors.New("Error marshalling the toCompany")
+	}
+	fmt.Println("==============Put state on toCompany========amt = %f " + strconv.FormatFloat(fromUser.CashBalance, 'f', 6, 64) + "==========")
+	err = stub.PutState(accountPrefix+args[0], toUserBytesToWrite)
+	if err != nil {
+		fmt.Println("===============Error writing the toCompany back")
+		return nil, errors.New("Error writing the toCompany back")
+	}
+
+	fmt.Println("==================***=== Successfully amount updated ====***====================")
+	return nil, nil
+}
+
+//===========================end============admin amount update function=================================================
