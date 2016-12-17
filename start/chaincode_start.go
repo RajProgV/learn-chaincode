@@ -659,7 +659,7 @@ func (t *SimpleChaincode) adminamtupdate(stub shim.ChaincodeStubInterface, args 
 
 	n := len(fromUser.Prefix)
 
-	if fromUser.Prefix[n-1] != "A" {
+	if string(fromUser.Prefix[n-1]) != "A" {
 		fmt.Println("===================Invalid request")
 		return nil, errors.New("Invalid Reuest to update amount for " + args[0])
 	}
