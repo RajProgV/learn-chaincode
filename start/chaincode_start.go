@@ -220,6 +220,9 @@ func (t *SimpleChaincode) Invoke(stub shim.ChaincodeStubInterface, function stri
 	} else if function == "transaction" {
 		fmt.Printf("=========================Function is transaction")
 		return t.transaction(stub, args)
+	} else if function == "amountupdate" {
+		fmt.Printf("=========================Function is admin amount ===")
+		return t.adminamtupdate(stub, args)
 	}
 
 	return nil, errors.New("Received unknown function invocation")
